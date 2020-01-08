@@ -1,14 +1,14 @@
 RegisterServerEvent('redemrp_banking:withdraw')
 AddEventHandler('redemrp_banking:withdraw', function(amount)
     local _source = source
+	
     local base = 0
 	local _amount = tonumber(amount)
 	--print(amount)
 	if amount ~= nil then
     TriggerEvent('redemrp:getPlayerFromId', source, function(user)
         local identifier = user.getIdentifier()
-        local charid = user.getSessionVar("charid")
-
+        local charid = user.getSessionVar("charid")		
         TriggerEvent("getBankMoney", identifier, charid, function(call)
             base = call
             if _amount == nil or _amount <= 0 or _amount > base then
@@ -78,6 +78,20 @@ AddEventHandler('redemrp_banking:balance2', function()
     end)
 end)
 
+AddEventHandler('getIdentifierFromName', function(namel, namef, callback)
+    local Callback = callback
+	local firstname = namef
+	local lastname = namel
+    MySQL.Async.fetchAll('SELECT identifier, characterid FROM characters WHERE `firstname`=@firstname AND `lastname`=@lastname;', {firstname = firstname, lastname = lastname}, function(name)
+		if name[1]then
+        local  identifier = name[1].identifier
+		local  charid = name[1].characterid
+		print(identifier)
+		print(charid)
+            Callback(identifier , charid)
+        end
+    end)
+end)
 
 AddEventHandler('getBankMoney', function(identifier, charid, callback)
     local Callback = callback
@@ -87,6 +101,73 @@ AddEventHandler('getBankMoney', function(identifier, charid, callback)
             Callback(bank)
         end
     end)
+end)
+RegisterServerEvent('redemrp_banking:transfer1')
+AddEventHandler('redemrp_banking:transfer1', function(_amount, firstname , lastname)
+if _amount ~= nil and firstname ~= nil and lastname ~= nil then
+local _source = source
+local function tchelper(first, rest)
+   return first:upper()..rest:lower()
+end
+local fn = firstname
+local ln = lastname
+local firstname2 = fn:gsub("(%a)([%w_']*)", tchelper)
+local lastname2 = ln:gsub("(%a)([%w_']*)", tchelper)
+
+
+
+    TriggerEvent("getIdentifierFromName", lastname2, firstname2, function(call , call2)
+        print(call)
+        print(call2)
+        TriggerEvent('transferMoney', _source, _amount ,call, call2)
+    end) 
+	end
+end)
+
+
+RegisterCommand('givemoney', function(source, args)
+    local namel = args[3]
+    local namef = args[2]
+    local amount = args[1]
+
+    TriggerEvent("getIdentifierFromName", namel, namef, function(call , call2)
+        print(call)
+        print(call2)
+        TriggerEvent('transferMoney', source, amount ,call, call2)
+    end)
+
+end)
+AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
+    local acctept = false
+    local _amount = amount
+    TriggerEvent('redemrp:getPlayerFromId', source, function(user)
+        local identifier = user.getIdentifier()
+        local charid = user.getSessionVar("charid")
+        TriggerEvent("getBankMoney", identifier, charid, function(call)
+            print(call)
+            Wait(500)
+            if (call-_amount) > 0 and call ~= nil then
+                local  bankmoney = call-_amount
+                acctept = true
+
+                print("zabrano ".. _amount)
+                print("aktualny stan ".. bankmoney)
+                MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoney .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = identifier, characterid = charid}, function(done)
+                    end)
+            end
+        end)
+    end)
+    Wait(500)
+    TriggerEvent("getBankMoney", targetI, targerC, function(callT)
+        local bankmoneyT = callT+_amount*5
+        print("dodano ".. _amount)
+        print("aktualny stan ".. bankmoneyT)
+        MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoneyT .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = targetI, characterid = targerC}, function(done)
+            end)
+
+    end)
+	Wait(500)
+			TriggerEvent('redemrp_banking:balance',source)
 end)
 
 

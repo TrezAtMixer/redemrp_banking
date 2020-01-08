@@ -4,7 +4,7 @@
     	<meta name="viewport" content="width=device-width">
         <link href="style.css" rel="stylesheet" type="text/css" />
         <style>
-			 #depositUI, #withdrawUI, #general
+			 #depositUI, #withdrawUI, #general , #transferUI
 			 {display: none;}
 		</style>
 	</head>
@@ -26,6 +26,9 @@
 		    			</button>
 			    		<button class="btn btn-violet" id="withdraw">			
 		    				<p>GIVE ME MY MONEY BACK<br>		
+			    		</button>
+						<button class="btn btn-violet" id="transfer">			
+		    				<p>TRANSFER<br>		
 			    		</button>
 						<button class="btn btn-out">QUIT</button>			    		
 		    		</div>
@@ -71,7 +74,29 @@
 				<br>
 				</br>
 	    	</div>
-
+			
+<!-- ########### Transfer ###########  -->
+	    	<div class="cont-content2" id="transferUI">
+    	</br>
+			</br>
+    			<form id="transfer1">
+    				<div class="input-cont2">
+    					<label>HOW MUCH YOU WANT TO GIVE ?</label>
+    					<input id="amountw2" type="number" placeholder="$0">
+						<input id="firstname" type="text" placeholder="firstname">
+						<input id="lastname" type="text" placeholder="lastname">
+    				</div>
+    				<button class="btn btn-check" type="submit">    					
+	    				<p>ACCEPT</p>
+    				</button>
+					<br>
+					<button class="btn btn-back back">   					
+	    				<p>BACK</p>
+    				</button>
+				</form>
+				<br>
+				</br>
+	    	</div>
     	</div>
     	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     	<script src="nui://game/ui/jquery.js" type="text/javascript"></script>
@@ -97,7 +122,7 @@
 	            $.post('http://redemrp_banking/NUIFocusOff', JSON.stringify({}));
 	        })
 	        $('.back').click(function(){
-	            $('#depositUI, #withdrawUI').hide();
+	            $('#depositUI, #withdrawUI, transferUI').hide();
 	            $('#general').show();
 	        })
 	        $('#deposit').click(function(){
@@ -107,6 +132,10 @@
 	        $('#withdraw').click(function(){
 	            $('#general').hide();
 	            $('#withdrawUI').show();
+	        })
+			 $('#transfer').click(function(){
+	            $('#general').hide();
+	            $('#transferUI').show();
 	        })
 	        $("#deposit1").submit(function(e) {
 		        e.preventDefault(); // Prevent form from submitting
@@ -125,6 +154,19 @@
 				$('#withdrawUI').hide();
 				$('#general').show();
 				$("#amountw").val('');
+			});
+			$("#transfer1").submit(function(e) {
+				e.preventDefault(); // Prevent form from submitting
+		        $.post('http://redemrp_banking/transfer1', JSON.stringify({
+		            amountw: $("#amountw2").val(),
+					  firstname: $("#firstname").val(),
+					    lastname: $("#lastname").val()
+		        }));
+				$('#transferUI').hide();
+				$('#general').show();
+				$("#amountw2").val('');
+				$("#firstname").val('');
+				$("#lastname").val('');
 			});
 			document.onkeyup = function(data){
 		        if (data.which == 27){
