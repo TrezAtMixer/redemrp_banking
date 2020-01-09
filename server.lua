@@ -155,6 +155,9 @@ AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
                 TriggerEvent("getBankMoney", targetI, targerC, function(callT)
                     local bankmoneyT = callT+_amount
                     MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoneyT .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = targetI, characterid = targerC}, function(done)
+					TriggerClientEvent("redemrp_notification:start", source, "The transfer of "..tonumber(_amount).."$ has been made", 2, "success")
+					Wait(500)
+					TriggerEvent('redemrp_banking:balance',source)
                 end)
             end)
             else
@@ -162,8 +165,6 @@ AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
             end
         end)
     end)
-	Wait(500)
-	TriggerEvent('redemrp_banking:balance',source)
 end)
 
 
