@@ -159,7 +159,7 @@ AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
     end)
     Wait(500)
     TriggerEvent("getBankMoney", targetI, targerC, function(callT)
-        local bankmoneyT = callT+_amount*5
+        local bankmoneyT = callT+_amount
         print("dodano ".. _amount)
         print("aktualny stan ".. bankmoneyT)
         MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoneyT .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = targetI, characterid = targerC}, function(done)
