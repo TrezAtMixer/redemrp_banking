@@ -137,6 +137,7 @@ RegisterCommand('givemoney', function(source, args)
     end)
 
 end)
+
 AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
     local acctept = false
     local _amount = amount
@@ -144,30 +145,25 @@ AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
         local identifier = user.getIdentifier()
         local charid = user.getSessionVar("charid")
         TriggerEvent("getBankMoney", identifier, charid, function(call)
-            print(call)
             Wait(500)
-            if (call-_amount) > 0 and call ~= nil then
+            if call ~= nil and call >= _amount and call > 0 then
                 local  bankmoney = call-_amount
                 acctept = true
-
-                print("zabrano ".. _amount)
-                print("aktualny stan ".. bankmoney)
                 MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoney .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = identifier, characterid = charid}, function(done)
-                    end)
+                end)
+                Wait(500)
+                TriggerEvent("getBankMoney", targetI, targerC, function(callT)
+                    local bankmoneyT = callT+_amount
+                    MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoneyT .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = targetI, characterid = targerC}, function(done)
+                end)
+            end)
+            else
+                TriggerClientEvent("redemrp_notification:start", source, "Tranfer Complete" , 2, "error")
             end
         end)
     end)
-    Wait(500)
-    TriggerEvent("getBankMoney", targetI, targerC, function(callT)
-        local bankmoneyT = callT+_amount
-        print("dodano ".. _amount)
-        print("aktualny stan ".. bankmoneyT)
-        MySQL.Async.execute("UPDATE characters SET `bank`='" .. bankmoneyT .. "' WHERE `identifier`=@identifier AND `characterid`=@characterid", {identifier = targetI, characterid = targerC}, function(done)
-            end)
-
-    end)
 	Wait(500)
-			TriggerEvent('redemrp_banking:balance',source)
+	TriggerEvent('redemrp_banking:balance',source)
 end)
 
 
