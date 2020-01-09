@@ -158,7 +158,7 @@ AddEventHandler('transferMoney', function(source, amount , targetI , targerC)
                 end)
             end)
             else
-                TriggerClientEvent("redemrp_notification:start", source, "Tranfer Complete" , 2, "error")
+                TriggerClientEvent("redemrp_notification:start", source, "You don't have enough money in the bank" , 2, "error")
             end
         end)
     end)
