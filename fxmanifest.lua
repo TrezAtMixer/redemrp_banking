@@ -1,4 +1,8 @@
-client_script('client/client.lua')
+client_scripts {
+    'config.lua',
+    'client/client.lua' 
+}
+    
 
 server_scripts {
     '@mysql-async/lib/MySQL.lua',
